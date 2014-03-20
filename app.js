@@ -8,6 +8,7 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
+var redis = require('redis').createClient();
 
 var app = express();
 
@@ -30,6 +31,23 @@ if ('development' === app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+var key = 'hoge:fuga';
+var value = 'piyo';
+
+// 文字列を保存する
+redis.set(key, value, function(){
+  // コールバック
+});
+//文字列を取得する
+redis.get(key, function(err, val){
+  // コールバック
+  if (err) {
+	return console.log(err);
+  }
+  // エラーが無ければデータを取得できたということ
+  console.log(val);
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
