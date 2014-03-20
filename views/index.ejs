@@ -1,3 +1,51 @@
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+var mainCtrl;
+mainCtrl = function($scope) {
+  $scope.connectId = "";
+  $scope.socketName = "";
+};
+
+var socket = io.connect('http://localhost:3000');
+//var socket = io.connect('http://10.211.55.2/');
+socket.on('connect', function(msg) {
+  console.log("connet");
+  $scope.connectId = socket.socket.transport.sessid;
+  $scope.socketName = socket.socket.transport.name;
+});
+
+// メッセージを受けたとき
+socket.on('message', function(msg) {
+  // メッセージを画面に表示する
+  document.getElementById("receiveMsg").innerHTML = msg.value;
+});
+
+// メッセージを送る
+function SendMsg() {
+  var msg = document.getElementById("message").value;
+  // メッセージを発射する
+  socket.emit('message', { value: msg });
+}
+// 切断する
+function DisConnect() {
+  var msg = socket.socket.transport.sessid + "は切断しました。";
+  // メッセージを発射する
+  socket.emit('message', { value: msg });
+  // socketを切断する
+  socket.disconnect();
+}
+</script>
+
+<style type="text/css">
+	table {
+		border: 0px;
+	}
+	/* --- 見出しセル --- */
+	.tableHeader {
+		background-color: #deefff; /* 見出しセルの背景色 */
+		width:10%;
+	}
+</style>
 <!DOCTYPE html>
 <html ng-app>
   <head>
@@ -6,7 +54,25 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+  <h1>socket.ioのサンプルプログラム</h1>
+  <br>
+  <div ng-controller="mainCtrl">
+	  <input type="text" id="message" value="">
+	  <input type="button" value="メッセージを送る" onclick="SendMsg()">
+	  <input type="button" value="切断する" onclick="DisConnect()">
+	  <table>
+	  	<tr>
+	  		<td class="tableHeader">ID</td>
+	  		<td ng-model="connectId"></td>
+	  		<td>{{connectId}}</td>
+	  		<td class="tableHeader">TYPE</td>
+	  		<td ng-bind="socketName"></td>
+	  	</tr>
+	  	<tr>
+	  		<td class="tableHeader">メッセージ</td>
+	  		<td id="receiveMsg"></td>
+	  	</tr>
+	  </table>
+  </div>
   </body>
 </html>
