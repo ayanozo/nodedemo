@@ -31,7 +31,16 @@ function DisConnect() {
   socket.disconnect();
 }
 </script>
-
+<style type="text/css">
+	table {
+		border: 0px;
+	}
+	/* --- 見出しセル --- */
+	.tableHeader {
+		background-color: #deefff; /* 見出しセルの背景色 */
+		width:10%;
+	}
+</style>
 <!DOCTYPE html>
 <html ng-app>
   <head>
@@ -41,12 +50,21 @@ function DisConnect() {
   </head>
   <body>
   <h1>socket.ioのサンプルプログラム</h1>
-  <div id="connectId"></div>
-  <div id="type"></div>
   <br>
   <input type="text" id="message" value="">
   <input type="button" value="メッセージを送る" onclick="SendMsg()">
   <input type="button" value="切断する" onclick="DisConnect()">
-  <div id="receiveMsg"></div>
+  <table>
+  	<tr>
+  		<td class="tableHeader">ID</td>
+  		<td id="connectId"></td>
+  		<td class="tableHeader">TYPE</td>
+  		<td id="type"></td>
+  	</tr>
+  	<tr>
+  		<td class="tableHeader">メッセージ</td>
+  		<td id="receiveMsg"></td>
+  	</tr>
+  </table>
   </body>
 </html>
