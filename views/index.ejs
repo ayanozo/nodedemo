@@ -1,39 +1,75 @@
 <script src="/socket.io/socket.io.js"></script>
+<script>
+  function mainCtrl($scope) {
+    var socket = io.connect();
+
+    $scope.connectId = '';
+    $scope.socketName = '';
+
+    socket.on('connect', function () {
+		$scope.connectId = socket.socket.transport.sessid;
+		$scope.socketName = socket.socket.transport.name;
+		$scope.$apply();
+    });
+
+    socket.on('message', function (msg) {
+      $scope.messages.push(msg);
+      $scope.$apply();
+    });
+
+    socket.on('roster', function (names) {
+      $scope.roster = names;
+      $scope.$apply();
+    });
+
+    $scope.send = function send() {
+      console.log('Sending message:', $scope.text);
+      socket.emit('message', $scope.text);
+      $scope.text = '';
+    };
+
+    $scope.setName = function setName() {
+      socket.emit('identify', $scope.name);
+    };
+  }
+</script>
+
 <script type="text/javascript">
-var mainCtrl;
-mainCtrl = function($scope) {
-  $scope.connectId = "test1";
-  $scope.socketName = "test2";
-};
+/****	
+	var mainCtrl;
+	mainCtrl = function($scope) {
+	  $scope.connectId = "test1";
+	  $scope.socketName = "test2";
+	};
 
-var socket = io.connect('http://localhost:3000');
-//var socket = io.connect('http://10.211.55.2/');
-socket.on('connect', function(msg) {
-  console.log("connet");
-  $scope.connectId = socket.socket.transport.sessid;
-  $scope.socketName = socket.socket.transport.name;
-});
+	var socket = io.connect('http://localhost:3000');
+	//var socket = io.connect('http://10.211.55.2/');
+	socket.on('connect', function(msg) {
+		console.log("connet");
 
-// メッセージを受けたとき
-socket.on('message', function(msg) {
-  // メッセージを画面に表示する
-  document.getElementById("receiveMsg").innerHTML = msg.value;
-});
-
-// メッセージを送る
-function SendMsg() {
-  var msg = document.getElementById("message").value;
-  // メッセージを発射する
-  socket.emit('message', { value: msg });
-}
-// 切断する
-function DisConnect() {
-  var msg = socket.socket.transport.sessid + "は切断しました。";
-  // メッセージを発射する
-  socket.emit('message', { value: msg });
-  // socketを切断する
-  socket.disconnect();
-}
+	});
+	
+	// メッセージを受けたとき
+	socket.on('message', function(msg) {
+	  // メッセージを画面に表示する
+	  document.getElementById("receiveMsg").innerHTML = msg.value;
+	});
+	
+	// メッセージを送る
+	function SendMsg() {
+	  var msg = document.getElementById("message").value;
+	  // メッセージを発射する
+	  socket.emit('message', { value: msg });
+	}
+	// 切断する
+	function DisConnect() {
+	  var msg = socket.socket.transport.sessid + "は切断しました。";
+	  // メッセージを発射する
+	  socket.emit('message', { value: msg });
+	  // socketを切断する
+	  socket.disconnect();
+	}
+***/	
 </script>
 
 <style type="text/css">
