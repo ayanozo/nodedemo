@@ -5,6 +5,7 @@
 
     $scope.connectId = '';
     $scope.socketName = '';
+    $scope.message = '';
 
     socket.on('connect', function () {
 		$scope.connectId = socket.socket.transport.sessid;
@@ -12,8 +13,9 @@
 		$scope.$apply();
     });
 
+	// メッセージを受けたとき
     socket.on('message', function (msg) {
-      $scope.messages.push(msg);
+      $scope.message = msg;
       $scope.$apply();
     });
 
@@ -22,6 +24,7 @@
       $scope.$apply();
     });
 
+	// メッセージを送る
     $scope.send = function send() {
       console.log('Sending message:', $scope.text);
       socket.emit('message', $scope.text);
@@ -35,32 +38,7 @@
 </script>
 
 <script type="text/javascript">
-/****	
-	var mainCtrl;
-	mainCtrl = function($scope) {
-	  $scope.connectId = "test1";
-	  $scope.socketName = "test2";
-	};
-
-	var socket = io.connect('http://localhost:3000');
-	//var socket = io.connect('http://10.211.55.2/');
-	socket.on('connect', function(msg) {
-		console.log("connet");
-
-	});
 	
-	// メッセージを受けたとき
-	socket.on('message', function(msg) {
-	  // メッセージを画面に表示する
-	  document.getElementById("receiveMsg").innerHTML = msg.value;
-	});
-	
-	// メッセージを送る
-	function SendMsg() {
-	  var msg = document.getElementById("message").value;
-	  // メッセージを発射する
-	  socket.emit('message', { value: msg });
-	}
 	// 切断する
 	function DisConnect() {
 	  var msg = socket.socket.transport.sessid + "は切断しました。";
@@ -69,7 +47,6 @@
 	  // socketを切断する
 	  socket.disconnect();
 	}
-***/	
 </script>
 
 <style type="text/css">
@@ -93,8 +70,8 @@
   <h1>socket.ioのサンプルプログラム</h1>
   <br>
   <div ng-controller="mainCtrl">
-	  <input type="text" id="message" value="">
-	  <input type="button" value="メッセージを送る" onclick="SendMsg()">
+	<input type="text" name="input" ng-model="text" ng-pattern="word" required ng-trim="false">
+	  <input type="button" value="メッセージを送る" ng-click="send()">
 	  <input type="button" value="切断する" onclick="DisConnect()">
 	  <table>
 	  	<tr>
@@ -106,7 +83,7 @@
 	  	</tr>
 	  	<tr>
 	  		<td class="tableHeader">メッセージ</td>
-	  		<td id="receiveMsg"></td>
+	  		<td ng-bind="message"></td>
 	  	</tr>
 	  </table>
   </div>
