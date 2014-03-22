@@ -26,6 +26,7 @@
 	    $scope.message = '';
 	    $scope.msgtext = '';
 	    $scope.loopCount = 0;
+	    $scope.redisCount = 0;
 	
 		// 接続したとき
 	    socket.on('connect', function () {
@@ -57,6 +58,12 @@
 	    	}
 	    });
 
+		// redisテストメッセージを受けたとき
+	    socket.on('msg_redistest', function (msg) {
+	      $scope.redisCount = msg;
+	      $scope.$apply();
+	    });
+
 		// メッセージを送る
 	    $scope.send = function send() {
 	      console.log('Sending message:', $scope.msgtext);
@@ -74,6 +81,12 @@
 	      		$("#loopButton").val("スタート");
 	    	}
 	    };
+
+		// RADISテスト開始
+	    $scope.RedisTestSatrt = function RedisTestSatrt() {
+	    	socket.emit('msg_redistest', 0);
+	    };
+	    
 	  }
 	</script>
   </head>
@@ -107,6 +120,13 @@
 			  		<input id="loopButton" type="button" value="スタート" ng-click="LoopTestSatrt()">
 		  		</td>
 		  		<td ng-bind="loopCount"></td>
+		  	</tr>
+		  	<tr>
+		  		<td class="tableHeader">redisテスト</td>
+		  		<td>
+			  		<input id="redisButton" type="button" value="送信" ng-click="RedisTestSatrt()">
+		  		</td>
+		  		<td ng-bind="redisCount"></td>
 		  	</tr>
 		  </table>
 	</form>

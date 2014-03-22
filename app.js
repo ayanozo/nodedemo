@@ -35,23 +35,6 @@ var connectCounter = 0;//接続数のカウンタ
 app.get('/', routes.index);
 app.get('/users', user.list);
 
-var key = 'hoge:fuga';
-var value = 'piyo';
-
-// 文字列を保存する
-redis.set(key, value, function(){
-  // コールバック
-});
-//文字列を取得する
-redis.get(key, function(err, val){
-  // コールバック
-  if (err) {
-	return console.log(err);
-  }
-  // エラーが無ければデータを取得できたということ
-  console.log(val);
-});
-
 //http.createServer(app).listen(app.get('port'), function(){
 //  console.log('Express server listening on port ' + app.get('port'));
 //});
@@ -70,17 +53,23 @@ io.sockets.on('connection', function(socket) {
 	connectCounter++;
 	console.log("connection");
 	
+	// クライアントが切断したときの処理
+	socket.on('disconnect', function(){
+		connectCounter--;
+		io.sockets.emit('msg_connect', connectCounter);
+	});
+
+	// メッセージを受けたときの処理
+	socket.on('msg_message', function(data) {
+		// クライアント全員に送信
+		socket.emit('msg_message', data);
+	});
+	
 	// メッセージを受けたときの処理
 	socket.on('msg_connect', function(data) {
 		// つながっているクライアント全員に送信
 		console.log("connection:" + connectCounter);
 		io.sockets.emit('msg_connect', connectCounter);
-	});
-	
-	// メッセージを受けたときの処理
-	socket.on('msg_message', function(data) {
-		// クライアント全員に送信
-		socket.emit('msg_message', data);
 	});
 	
 	// ループテストメッセージを受けたときの処理
@@ -90,9 +79,19 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('msg_looptest', data);
 	});
 	
-	// クライアントが切断したときの処理
-	socket.on('disconnect', function(){
-		connectCounter--;
-		io.sockets.emit('msg_connect', connectCounter);
+	// RADISテストメッセージを受けたときの処理
+	socket.on('msg_redistest', function(data) {
+		var key = 'redis:count';
+		//カウントアップ
+		redis.incr(key, function(err, val){
+			// コールバック
+			if (err) {
+				return console.log(err);
+			}
+			// エラーが無ければデータを取得できたということ
+			socket.emit('msg_redistest', val);
+		});
 	});
+	
 });
+
