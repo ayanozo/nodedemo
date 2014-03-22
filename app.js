@@ -69,14 +69,14 @@ io.sockets.on('connection', function(socket) {
 	socket.on('message', function(data) {
 		// つながっているクライアント全員に送信
 		console.log("message:" + data);
-		io.sockets.emit('message', data);
+		socket.emit('message', data);
 	});
 	// ループテストメッセージを受けたときの処理
 	socket.on('looptest', function(data) {
 		// つながっているクライアント全員に送信
 		console.log("looptest:" + data);
 		data++;
-		io.sockets.emit('looptest', data);
+		socket.emit('looptest', data);
 	});
 	
 	// クライアントが切断したときの処理
