@@ -79,7 +79,7 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('msg_looptest', data);
 	});
 	
-	// RADISテストメッセージを受けたときの処理
+	// REDISテストメッセージを受けたときの処理
 	socket.on('msg_redistest', function(data) {
 		var key = 'redis:count';
 		//カウントアップ
