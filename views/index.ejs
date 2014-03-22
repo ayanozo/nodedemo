@@ -26,7 +26,12 @@
 	    $scope.message = '';
 	    $scope.msgtext = '';
 	    $scope.loopCount = 0;
+	    $scope.loopTime = 0;
+	    $scope.loopAve = 0;
 	    $scope.redisCount = 0;
+
+		var startTime;
+		var currentTime;
 	
 		// 接続したとき
 	    socket.on('connect', function () {
@@ -50,8 +55,11 @@
 	
 		// ループテストメッセージを受けたとき
 	    socket.on('msg_looptest', function (msg) {
-	      $scope.loopCount = msg;
-	      $scope.$apply();
+	    	cuurentTime = new Date();
+	    	var ave = $scope.loopCount / ((cuurentTime - startTime) / 1000);
+	    	$scope.loopAve = Math.floor(ave * 10) / 10
+			$scope.loopCount = msg;
+			$scope.$apply();
 	    	var btn = $("#loopButton").val();
 	    	if (btn == "ストップ") {
 		    	socket.emit('msg_looptest', $scope.loopCount);
@@ -76,6 +84,8 @@
 	    	var btn = $("#loopButton").val();
 	    	if (btn == "スタート") {
 	      		$("#loopButton").val("ストップ");
+			    startTime = new Date();
+			    $scope.loopCount = 0;
 		    	socket.emit('msg_looptest', $scope.loopCount);
 	    	} else {
 	      		$("#loopButton").val("スタート");
@@ -120,6 +130,7 @@
 			  		<input id="loopButton" type="button" value="スタート" ng-click="LoopTestSatrt()">
 		  		</td>
 		  		<td ng-bind="loopCount"></td>
+		  		<td >平均時間:{{loopAve}}</td>
 		  	</tr>
 		  	<tr>
 		  		<td class="tableHeader">redisテスト</td>
