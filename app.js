@@ -8,7 +8,6 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
-var redis = require('redis').createClient();
 
 var app = express();
 
