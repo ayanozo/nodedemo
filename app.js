@@ -29,6 +29,9 @@ if ('development' === app.get('env')) {
   app.use(express.errorHandler());
 }
 
+var connectCounter = 0;//接続数のカウンタ
+
+
 app.get('/', routes.index);
 app.get('/users', user.list);
 
@@ -64,23 +67,32 @@ var io = socketIO.listen(server);
 
 // クライアントが接続してきたときの処理
 io.sockets.on('connection', function(socket) {
+	connectCounter++;
 	console.log("connection");
+	
 	// メッセージを受けたときの処理
-	socket.on('message', function(data) {
+	socket.on('msg_connect', function(data) {
 		// つながっているクライアント全員に送信
-		console.log("message:" + data);
-		socket.emit('message', data);
+		console.log("connection:" + connectCounter);
+		io.sockets.emit('msg_connect', connectCounter);
 	});
+	
+	// メッセージを受けたときの処理
+	socket.on('msg_message', function(data) {
+		// クライアント全員に送信
+		socket.emit('msg_message', data);
+	});
+	
 	// ループテストメッセージを受けたときの処理
-	socket.on('looptest', function(data) {
-		// つながっているクライアント全員に送信
-		console.log("looptest:" + data);
+	socket.on('msg_looptest', function(data) {
+		// クライアント全員に送信
 		data++;
-		socket.emit('looptest', data);
+		socket.emit('msg_looptest', data);
 	});
 	
 	// クライアントが切断したときの処理
 	socket.on('disconnect', function(){
-		console.log("disconnect");
+		connectCounter--;
+		io.sockets.emit('msg_connect', connectCounter);
 	});
 });

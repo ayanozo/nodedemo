@@ -22,6 +22,7 @@
 	
 	    $scope.connectId = '';
 	    $scope.socketName = '';
+	    $scope.connectCount = 0;
 	    $scope.message = '';
 	    $scope.msgtext = '';
 	    $scope.loopCount = 0;
@@ -30,29 +31,36 @@
 	    socket.on('connect', function () {
 			$scope.connectId = socket.socket.transport.sessid;
 			$scope.socketName = socket.socket.transport.name;
+	    	socket.emit('msg_connect', 0);
 			$scope.$apply();
 	    });
 	
+		// 接続メッセージを受けたとき
+	    socket.on('msg_connect', function (msg) {
+	      $scope.connectCount = msg;
+	      $scope.$apply();
+	    });
+	
 		// メッセージを受けたとき
-	    socket.on('message', function (msg) {
+	    socket.on('msg_message', function (msg) {
 	      $scope.message = msg;
 	      $scope.$apply();
 	    });
 	
 		// ループテストメッセージを受けたとき
-	    socket.on('looptest', function (msg) {
+	    socket.on('msg_looptest', function (msg) {
 	      $scope.loopCount = msg;
 	      $scope.$apply();
 	    	var btn = $("#loopButton").val();
 	    	if (btn == "ストップ") {
-		    	socket.emit('looptest', $scope.loopCount);
+		    	socket.emit('msg_looptest', $scope.loopCount);
 	    	}
 	    });
 
 		// メッセージを送る
 	    $scope.send = function send() {
 	      console.log('Sending message:', $scope.msgtext);
-	      socket.emit('message', $scope.msgtext);
+	      socket.emit('msg_message', $scope.msgtext);
 	      $scope.msgtext = '';
 	    };
 
@@ -61,7 +69,7 @@
 	    	var btn = $("#loopButton").val();
 	    	if (btn == "スタート") {
 	      		$("#loopButton").val("ストップ");
-		    	socket.emit('looptest', $scope.loopCount);
+		    	socket.emit('msg_looptest', $scope.loopCount);
 	    	} else {
 	      		$("#loopButton").val("スタート");
 	    	}
@@ -74,8 +82,6 @@
   <br>
   <div ng-controller="mainCtrl">
   	<form ng-submit="send()">
-  		<input type="text" ng-model="msgtext">
-		<input type="submit" value="メッセージを送る">
 		<table>
 		  	<tr>
 		  		<td class="tableHeader">ID</td>
@@ -84,8 +90,16 @@
 		  		<td ng-bind="socketName"></td>
 		  	</tr>
 		  	<tr>
-		  		<td class="tableHeader">メッセージ</td>
-		  		<td ng-bind="message"></td>
+		  		<td class="tableHeader">接続数</td>
+		  		<td ng-bind="connectCount"></td>
+		  	</tr>
+		  	<tr>
+		  		<td class="tableHeader">メッセージ送信テスト</td>
+		  		<td>
+			  		<input type="text" ng-model="msgtext">
+					<input type="submit" value="メッセージを送る">
+			  		<td ng-bind="message"></td>
+		  		</td>
 		  	</tr>
 		  	<tr>
 		  		<td class="tableHeader">ループカウントテスト</td>
