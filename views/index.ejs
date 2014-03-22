@@ -7,6 +7,9 @@
 		table {
 			border: 0px;
 		}
+		table td {
+			width:20%;
+		}
 		/* --- 見出しセル --- */
 		.tableHeader {
 			background-color: #deefff; /* 見出しセルの背景色 */
@@ -109,6 +112,8 @@
 		  	<tr>
 		  		<td class="tableHeader">ID</td>
 		  		<td ng-bind="connectId"></td>
+		  	</tr>
+		  	<tr>
 		  		<td class="tableHeader">TYPE</td>
 		  		<td ng-bind="socketName"></td>
 		  	</tr>
@@ -118,7 +123,7 @@
 		  	</tr>
 		  	<tr>
 		  		<td class="tableHeader">メッセージ送信テスト</td>
-		  		<td>
+		  		<td colspan=2>
 			  		<input type="text" ng-model="msgtext">
 					<input type="submit" value="メッセージを送る">
 			  		<td ng-bind="message"></td>
