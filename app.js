@@ -39,15 +39,24 @@ var User = db.model("User", UserSchema);
 // サーバー起動時にユーザーが無ければ、テスト用のデータを投入します。
 // 間違っても本番用のサーバーにこんなコードを入れちゃ駄目です。
 //console.log("db user :" + User.count({}));
-//if(User.count({}) == 0){
-/**
+if(User.count({}) == 0){
 	console.log("db user create!!");
     var aaaUser = new User();
     aaaUser.email = "aaa@example.com";
     aaaUser.password = getHash("aaa");
     aaaUser.save();
-**/
-//}
+}
+
+//passportでのセッション設定
+//シリアライズの設定をしないと、user.passwordでパスワードがポロリする可能性があるので、必要な項目だけ持たせる
+passport.serializeUser(function(user, done){
+ done(null, {email: user.email, _id: user._id});
+});
+passport.deserializeUser(function(serializedUser, done){
+ User.findById(serializedUser._id, function(err, user){
+     done(err, user);
+ });
+});
 
 //LOcalStrategyを使う設定
 passport.use(new LocalStrategy(
@@ -58,13 +67,20 @@ passport.use(new LocalStrategy(
     // 非同期で処理させるといいらしいです
     process.nextTick(function(){
         User.findOne({email: email}, function(err, user){
-            if(err)
-                return done(err);
-            if(!user)
+            if(err) {
+    			console.log("authenticate error");
+                return done(err);            	
+            }
+            if(!user) {
+    			console.log("authenticate user error");
                 return done(null, false, {message: "ユーザーが見つかりませんでした。"});
+            }
             var hashedPassword = getHash(password);
-            if(user.password !== hashedPassword)
+            if(user.password !== hashedPassword) {
+    			console.log("authenticate password error");
                 return done(null, false, {message: "パスワードが間違っています。"});
+            }
+			console.log("authenticate check ok");
             return done(null, user);
         });
     });
@@ -115,7 +131,7 @@ app.get('/users', user.list);
 //app.get('/login', routeslogin.index);
 /**/
 app.get("/login", function(req, res){
-	req.flash("test");
+	//req.flash("test");
     res.render("login", {user: req.user, message: req.flash("error")});
 });
 /**/
